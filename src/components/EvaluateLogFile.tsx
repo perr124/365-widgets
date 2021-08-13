@@ -1,16 +1,15 @@
 import React from "react";
 import { useState } from "react";
-import "./TextReader.css";
+import "./EvaluateLogFile.css";
 
 import { BeatLoader } from "react-spinners";
-import { useEffect } from "react";
+import { css } from "@emotion/react";
 
 //Manage types here to make process dynamic - just add a case in processReadings() and necessary calculations
 const sensorTypes = ["thermometer", "humidity", "monoxide"];
 
-const TextReader = () => {
+const EvaluateLogFile: React.FC<any> = ({ logContentsStr }) => {
   const [output, setOutput] = useState();
-  const [contentsArray, setContentsArray] = useState([""]);
   const [loading, setLoading] = useState(false);
   //   const [fileContent, setFileContent] = useState([]);
 
@@ -20,29 +19,13 @@ const TextReader = () => {
   const showLoader = () => {
     setLoading(true);
   };
-
-  const evaluateLogFile = (logContentsStr: any) => {
-    const file = logContentsStr.target.files[0];
-    const reader = new FileReader();
-    reader.readAsText(file);
-    reader.onload = () => {
-      if (!(reader.result!.toString().lastIndexOf("reference", 0) === 0)) {
-        //Quick check to make sure user uploaded the right file
-        alert(
-          "Please make sure the file you have uploaded has the correct file structure."
-        );
-        return;
-      }
-
-      setContentsArray(reader.result!.toString().split("\n"));
-    };
-    reader.onerror = (err) => {
-      console.log(err);
-      alert(err);
-    };
-  };
+  const loaderCSS = css`
+    display: flex;
+    top: 100px;
+  `;
 
   const handleClick = () => {
+    console.log(logContentsStr);
     showLoader();
 
     //Initialize two objects to record values from .txt accordingly. structuredReadings will be the parent object
@@ -55,7 +38,7 @@ const TextReader = () => {
       value: [],
     };
     //Begin Loop for each item on new line
-    contentsArray.map((reading, index) => {
+    logContentsStr.split("\n").map((reading: any, index: number) => {
       if (index == 0) {
         structuredReadings.reference = {
           temperature: parseFloat(reading.split(" ")[1]),
@@ -112,10 +95,8 @@ const TextReader = () => {
       mean <= parseFloat(readings.reference.temperature) + 0.5
     ) {
       if (standardDeviation < 3) {
-        console.log("ultra precise");
         return "ultra precise";
       } else if (standardDeviation < 5) {
-        console.log("very precise");
         return "very precise";
       }
     }
@@ -194,16 +175,14 @@ const TextReader = () => {
     }
     hideLoader();
     setOutput(output);
+    console.log(output);
   };
 
   return loading ? (
-    <BeatLoader size={30} />
+    <BeatLoader css={loaderCSS} size={30} />
   ) : (
     <div className='flex-container'>
       <div className='row'>
-        <h2>Upload text file below.</h2>
-        <input id='file-input' type='file' onChange={evaluateLogFile} />
-        <br />
         <button id='start-eval' onClick={handleClick}>
           Begin Evaluation
         </button>
@@ -213,4 +192,4 @@ const TextReader = () => {
   );
 };
 
-export default TextReader;
+export default EvaluateLogFile;

@@ -8,6 +8,24 @@
   font-size: 0.8em;
 }
 
+.flex-container {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.row {
+  width: auto;
+}
+
+input {
+  color: red;
+  text-align: center;
+  margin-left: 80px;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
